@@ -12,10 +12,10 @@ import java.util.stream.Collectors;
 
 public class ProfesorImpl implements Profesor {
 
-    private int id;
-    private String name;
-    private Set<Profesor> friends;
-    private Collection<CasaDeBurrito> favorites;
+    private final int id;
+    private final String name;
+    private final Set<Profesor> friends;
+    private final Collection<CasaDeBurrito> favorites;
 
     public ProfesorImpl(int id, String name) {
         this.id = id;
@@ -43,7 +43,7 @@ public class ProfesorImpl implements Profesor {
 
     @Override
     public Profesor favorite(CasaDeBurrito c) throws UnratedFavoriteCasaDeBurritoException {
-        if (c == null || !c.isRatedBy(this))
+        if (!c.isRatedBy(this))
             throw new UnratedFavoriteCasaDeBurritoException();
         favorites.add(c);
         return this;
@@ -62,7 +62,6 @@ public class ProfesorImpl implements Profesor {
             throw new ConnectionAlreadyExistsException();
 
         friends.add(p);
-
         return this;
     }
 
@@ -73,50 +72,49 @@ public class ProfesorImpl implements Profesor {
 
     @Override
     public Set<Profesor> filteredFriends(Predicate<Profesor> p) {
-        if (p==null)
-            return getFriends();
-
         return getFriends().stream().filter(p).collect(Collectors.toSet());
     }
 
     @Override
     public Collection<CasaDeBurrito> filterAndSortFavorites(Comparator<CasaDeBurrito> comp, Predicate<CasaDeBurrito> p) {
-        if (comp == null || p == null)
-            return favorites();
-
         return favorites().stream().filter(p).sorted(comp).collect(Collectors.toList());
     }
 
     @Override
-    public Collection<CasaDeBurrito> favoritesByRating(int rLimit) {
+    public Collection<CasaDeBurrito> favoritesByRating(int r) {
         Comparator<CasaDeBurrito> rating_comp = Comparator
-                                            .comparing(CasaDeBurrito::averageRating)
-                                            .reversed()
-                                            .thenComparing(CasaDeBurrito::distance)
-                                            .thenComparing(CasaDeBurrito::getId);
-        return filterAndSortFavorites(rating_comp , casa -> casa.averageRating() >= rLimit);
+                                    .comparing(CasaDeBurrito::averageRating,
+                                                Comparator.reverseOrder())
+                                    .thenComparing(CasaDeBurrito::distance)
+                                    .thenComparing(CasaDeBurrito::getId);
+        return  favorites().stream()
+                           .filter(casa -> casa.averageRating() >= r)
+                           .sorted(rating_comp).collect(Collectors.toList());
     }
 
     @Override
-    public Collection<CasaDeBurrito> favoritesByDist(int dLimit) {
+    public Collection<CasaDeBurrito> favoritesByDist(int d) {
         Comparator<CasaDeBurrito> dist_comp = Comparator
                 .comparing(CasaDeBurrito::distance)
                 .thenComparing(CasaDeBurrito::averageRating, Comparator.reverseOrder())
                 .thenComparing(CasaDeBurrito::getId);
 
-        return filterAndSortFavorites(dist_comp , casa -> casa.distance() <= dLimit);
+        return  favorites().stream()
+                .filter(casa -> casa.distance() <= d)
+                .sorted(dist_comp).collect(Collectors.toList());
     }
 
     @Override
     public int compareTo(Profesor o) {
-        return (o!=null) ? this.getId() - o.getId() : 1;    // if o is null we assume the prof is "bigger"
+        return this.getId() - o.getId();
     }
 
     @Override
     public boolean equals(Object o) {
         if ( !(o instanceof Profesor) )
             return false;
-        return compareTo( (Profesor)o ) == 0;
+        Profesor p = (Profesor) o;
+        return p.getId() == this.id;
     }
 
     @Override

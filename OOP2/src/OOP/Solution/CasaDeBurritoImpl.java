@@ -22,7 +22,7 @@ public class CasaDeBurritoImpl implements CasaDeBurrito {
         this.burrito_rates = new HashMap<>(c.burrito_rates);
     }
 
-    public CasaDeBurritoImpl(int id,String name, int dst, Set<String> menu) {
+    public CasaDeBurritoImpl(int id, String name, int dst, Set<String> menu) {
         this.id = id;
         this.name = name;
         this.dst = dst;
@@ -74,8 +74,8 @@ public class CasaDeBurritoImpl implements CasaDeBurrito {
         if (!(obj instanceof CasaDeBurrito)) {
             return false;
         }
-        CasaDeBurrito casaDeBurrito = (CasaDeBurrito) obj;
-        return this.getId() == casaDeBurrito.getId();
+        CasaDeBurrito casa = (CasaDeBurrito) obj;
+        return this.getId() == casa.getId();
     }
 
     @Override
@@ -91,7 +91,7 @@ public class CasaDeBurritoImpl implements CasaDeBurrito {
     @Override
     public String toString() {
 
-        String menu_lexicordered = menu.stream().sorted().reduce((s1, s2) -> s1+", "+s2).orElse("");
+        String menu_lexicordered = this.menu.stream().sorted().reduce((s1, s2) -> s1+", "+s2).orElse("");
 
         return "CasaDeBurrito: " + getName() +".\n" +
                 "Id: " + getId() + ".\n" +
