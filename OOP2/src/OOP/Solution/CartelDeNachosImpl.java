@@ -121,7 +121,6 @@ public class CartelDeNachosImpl implements CartelDeNachos {
 
     private class graphSearchClass {
         private Map<Integer, Boolean> visited;
-        private Profesor p;
         private CasaDeBurrito c;
         private graphSearchClass(CasaDeBurrito casa) {
             visited = new HashMap<>();
